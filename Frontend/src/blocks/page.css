@@ -1,0 +1,35 @@
+body {
+  background-color: black;
+  border: none;
+}
+
+.page {
+  background-color: black;
+  margin: 0 auto;
+  font-size: 24px;
+  line-height: 1.2em;
+  max-width: 100%;
+  padding: 0;
+}
+.page_none {
+  display: none;
+}
+.page__background {
+  top: 0;
+  right: 0;
+  left: 0;
+  display: none;
+  width: 100%;
+  height: 120%;
+  background-color: black;
+  opacity: 0.4;
+  position: fixed;
+  z-index: 1;
+}
+.page_menu_opened {
+  transform: translate(0px, 117px)
+}
+.page__background_opened {
+  display: flex;
+}
+

@@ -1,0 +1,106 @@
+.nav {
+  height: 50px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.header_nav {
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  border-bottom: solid 1px rgba(84, 84, 84, 0.7);
+  width: 70%;
+}
+.nav_mobile {
+  display: flex;
+  height: 60px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav__item {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+  cursor: pointer;
+  margin: 0;
+  color: white;
+  padding: 0 12px;
+}
+.nav__email {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  color: white;
+  margin: 0 24px 0 0;
+}
+.nav__hidden {
+  display: none;
+}
+.nav_menu_opened {
+  transform: translate(0px, 137px);
+}
+.nav__button-line {
+  width: 24px;
+  height: 2px;
+  background-color: white;
+  box-sizing: border-box;
+  transition: all 0.5s ease-in-out;
+}
+.nav__button-line_closing {
+  opacity: 0;
+}
+
+.nav__button-line_closing:first-of-type {
+  opacity: 1;
+  transform: translate(0px, 8px) rotate(135deg);
+}
+
+.nav__button-line_closing:last-of-type {
+  opacity: 1;
+  transform: translate(0px, -8px) rotate(-135deg);
+}
+.nav__button {
+  width: 24px;
+  height: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: black;
+  padding: 0;
+  box-sizing: border-box;
+  transition: all 0.5s ease;
+  cursor: pointer;
+  border-style: none;
+  outline-style: none;
+  margin-right: 20px;
+}
+
+@media (max-width: 700px) {
+  .header_nav {
+    width: 100%;
+  }
+  .nav__container {
+    position: absolute;
+    top: -117px;
+    width: 100%;
+    padding: 0px 0 10px 0;
+    border-bottom: solid 1px rgba(84, 84, 84, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background-color: black;
+  }
+}
+@media (min-width: 701px) {
+  .nav__container {
+    display: none;
+  }
+}

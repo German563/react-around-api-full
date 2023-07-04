@@ -1,0 +1,223 @@
+.popup__close {
+  background: transparent url(../images/Close_Icon.svg) center no-repeat;
+  width: 40px;
+  height: 40px;
+  border: none;
+  position: absolute;
+  right: -40px;
+  top: -45px;
+  cursor: pointer;
+}
+
+.popupImg__close:hover {
+  opacity: 0.6;
+}
+
+.popupImg__close {
+  background: transparent url(../images/Close_Icon.svg) center no-repeat;
+  width: 40px;
+  height: 40px;
+  border: none;
+  position: absolute;
+  right: -40px;
+  top: -45px;
+  cursor: pointer;
+}
+
+.popup__close:hover {
+  opacity: 0.6;
+}
+
+.popup {
+  position: fixed;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 0.5s, opacity 0.5s linear;
+  max-width: calc(430px - 72px);
+  max-height: calc(330px - 36px);
+  left: calc(50% - 215px);
+  top: calc(50% - 115px);
+  background: #ffffff;
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  padding: 0 36px 36px 36px;
+  z-index: 2;
+}
+
+.popupImg {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.5s linear;
+  position: absolute;
+  max-width: calc(430px - 72px);
+  max-height: calc(330px - 36px);
+  left: calc(50% - 215px);
+  top: calc(50% - 115px);
+  background: #ffffff;
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+}
+
+.popup_opened {
+  visibility: visible;
+  opacity: 1;
+  transition: 0.5s;
+}
+
+.popupImg_opened {
+  visibility: visible;
+  opacity: 1;
+  transition: 0.5s;
+}
+
+.popup__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.popup__title {
+  font-family: "Inter", sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 1.2em;
+  letter-spacing: 0em;
+  margin-top: 34px;
+  width: 330px;
+}
+
+.popup__input {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.2em;
+  width: 358px;
+  margin-bottom: 5px;
+}
+
+.popup__input_type_error {
+  border-bottom: 1px solid red;
+}
+
+.popup__label {
+  visibility: hidden;
+  text-align: left;
+  width: 358px;
+  height: 10px;
+  margin-top: 5px;
+  padding-bottom: 13px;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #ff0000;
+}
+
+.popup__error_visible {
+  visibility: visible;
+}
+
+.popup__button {
+  background-color: black;
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.2em;
+  text-align: center;
+  border-radius: 2px;
+  width: 358px;
+  height: 50.15px;
+  margin-top: calc(48px - 29px);
+  cursor: pointer;
+}
+
+.popup__button_disabled {
+  background-color: white;
+  color: black;
+  border: 1px solid #000000;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.popup__button:hover {
+  opacity: 0.8;
+}
+
+.popup_type_foto {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url(../images/lago-di-braies.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-color: transparent;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.popup__title-foto {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #ffffff;
+  position: absolute;
+  bottom: -40px;
+  left: 0;
+}
+.popup__tooltip-image {
+  margin: 60px auto 32px;
+}
+.popup__container_tooltip {
+  display: flex;
+  flex-direction: column;
+}
+.popup__tooltip-title {
+  font-family: 'Inter';
+font-style: normal;
+font-weight: 900;
+font-size: 24px;
+line-height: 29px;
+text-align: center;
+
+color: #000000;
+}
+
+@media only screen and (min-width: 320px) and (max-width: 768px) {
+  .popup {
+    top: 123px;
+    width: calc(282px - 44px);
+    padding: 25px 22px;
+    left: 5%;
+  }
+
+  .popup__button {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .popup__input {
+    width: 100%;
+  }
+
+  .popup__title {
+    margin: 0 0 46px 0;
+  }
+
+  .popup__label {
+    width: calc(282px - 44px);
+    color: #ff0000;
+  }
+  .popup_type_foto {
+    top: 5%;
+    left: 5%;
+    transform: none;
+}
+}
