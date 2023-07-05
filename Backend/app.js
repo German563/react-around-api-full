@@ -25,6 +25,11 @@ const validateURL = (value, helpers) => {
 app.use(express.json()); // Parse request bodies as JSON
 
 app.use(auth);
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Server will crash now');
+  }, 0);
+});
 
 app.post(
   '/signin',
