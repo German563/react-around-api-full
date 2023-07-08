@@ -1,90 +1,83 @@
 const Card = require('../models/card');
-const {
-  ERROR_CODE_USER, ERROR_CODE_BAD_REQUEST, ERROR_CODE_SERVER, message400, message500,
-} = require('../utils/errors');
 
-const getCards = async (req, res) => {
-  try {
-    const card = await Card.find({});
-    res.send(card);
-  } catch (err) {
-    res.status(ERROR_CODE_SERVER).send({ message: 'Internal server error' });
-  }
+const NotFoundError = require('../errors/not-found-error');
+const BadRequestError = require('../errors/bad-request-error');
+const AccessError = require('../errors/access-error');
+
+const getCards = (req, res, next) => {
+  Card.find({})
+    .then((cardList) => res.send(cardList))
+    .catch((error) => next(error));
 };
 
-const createCard = async (req, res) => {
-  try {
-    const { name, link } = req.body;
-    const owner = req.user._id;
-    const card = await Card.create({
-      owner, name, link,
-    });
-    res.send(card);
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      res.status(ERROR_CODE_USER).send({ message: message400 });
-    } else {
-      res.status(ERROR_CODE_SERVER).send({ message: message500 });
-    }
-  }
+const createCard = (req, res, next) => {
+  const { name, link } = req.body;
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
+    .then((card) => res.send({ data: card }))
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        throw new BadRequestError('Invalid Data');
+      }
+    })
+    .catch(next);
 };
-const deleteCard = async (req, res) => {
-  try {
-    const card = await Card.findByIdAndRemove(req.params.id);
-    if (!card) {
-      res.status(ERROR_CODE_BAD_REQUEST).send({ message: 'No card with such Id' });
-    } else {
-      res.send(card);
-    }
-  } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(ERROR_CODE_USER).send({ message: message400 });
-    } else {
-      res.status(ERROR_CODE_SERVER).send({ message: message500 });
-    }
-  }
-};
-
-const likeCard = async (req, res) => {
-  try {
-    const card = await Card.findByIdAndUpdate(
-      req.params.id,
-      { $addToSet: { likes: req.user._id } },
-      { new: true },
-    );
-    if (!card) {
-      res.status(ERROR_CODE_BAD_REQUEST).send({ message: 'No card with such Id' });
-    } else {
-      res.send(card);
-    }
-  } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(ERROR_CODE_USER).send({ message: message400 });
-    } else {
-      res.status(ERROR_CODE_SERVER).send({ message: message500 });
-    }
-  }
+const deleteCard = (req, res, next) => {
+  const owner = req.user._id;
+  Card
+    .findOne({ _id: req.params.cardId })
+    .orFail(() => new NotFoundError('No card with such Id'))
+    .then((card) => {
+      if (!card.owner.equals(owner)) {
+        next(new AccessError('Cant delete tis card'));
+      } else {
+        Card.deleteOne(card)
+          .then(() => res.status(200).send({ message: 'Card was deleted' }));
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Invalid Data'));
+      }
+      throw err;
+    })
+    .catch(next);
 };
 
-const disLikeCard = async (req, res) => {
-  try {
-    const card = await Card.findByIdAndUpdate(
-      req.params.id,
-      { $pull: { likes: req.user._id } },
-      { new: true },
-    );
-    if (!card) {
-      res.status(ERROR_CODE_BAD_REQUEST).send({ message: 'No card with such Id' });
-    } else {
-      res.send(card);
-    }
-  } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(ERROR_CODE_USER).send({ message: message400 });
-    } else {
-      res.status(ERROR_CODE_SERVER).send({ message: message500 });
-    }
-  }
+const likeCard = (req, res, next) => {
+  const owner = req.user._id;
+  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: owner } }, { new: true })
+    .then((card) => {
+      if (!card) {
+        throw new NotFoundError('No card with such Id');
+      }
+      return res.status(200).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Invalid Data');
+      }
+      throw err;
+    })
+    .catch(next);
+};
+
+const disLikeCard = (req, res, next) => {
+  const owner = req.user._id;
+  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: owner } }, { new: true })
+    .then((card) => {
+      if (!card) {
+        throw new NotFoundError('No card with such Id');
+      }
+      return res.status(200).send(card);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Invalid Data');
+      }
+      throw err;
+    })
+    .catch(next);
 };
 
 module.exports = {

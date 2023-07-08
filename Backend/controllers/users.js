@@ -1,99 +1,107 @@
-
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-const User = require('../models/user');
-const {
-  ERROR_CODE_USER, ERROR_CODE_BAD_REQUEST, ERROR_CODE_SERVER, message400, message500,
-} = require('../utils/errors');
+const NotFoundError = require('../errors/not-found-error');
+const BadRequestError = require('../errors/bad-request-error');
+const ConflictError = require('../errors/conflict-error');
+const UnauthorizedError = require('../errors/unauthorized-error');
 
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(ERROR_CODE_SERVER).send({ message: 'Internal server error' });
-  }
+const getUsers = async (req, res, next ) => {
+  User.find({})
+    .then((users) => res.status(200).send(users))
+    .catch(next);
 };
-
-const getUserById = (req, res) => {
-  User.findById(req.params.userId)
+const getMe = (req, res, next) => {
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_CODE_BAD_REQUEST).send({ message: 'User not found' });
+        throw new NotFoundError('User not found');
       }
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_CODE_USER).send({ message: message400 });
-      } else {
-        res.status(ERROR_CODE_SERVER).send({ message: message500 });
+        throw new BadRequestError('Invalid Data');
       }
-    });
+      throw err;
+    })
+    .catch(next);
 };
 
-const createUser = (req, res) => {
+const getUserById = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        next(new NotFoundError('No user with such id'));
+      }
+      return res.status(200).send({ data: user });
+    })
+    .catch(next);
+};
+
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  User.create({
-    name,
-    about,
-    avatar,
-    email,
-    password,
-  })
-    .then((user) => res.status(200).send(user))
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((user) => res.status(200).send({ mail: user.email }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_USER).send({ message: message400 });
-      } else {
-        res.status(ERROR_CODE_SERVER).send({ message: message500 });
-      }
-    });
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        throw new BadRequestError('Invalid Data');
+      } else if (err.name === 'MongoError' || err.code === '11000') {
+        throw new ConflictError('Can`t use this email');
+      } else next(err);
+    })
+    .catch(next);
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, {
       name: req.body.name,
       about: req.body.about,
-    }, { runValidators: true, new: true })
-      .orFail(new Error('NotValidId'));
+    }, { runValidators: true, new: true });
+
+    if (!user) {
+      throw new NotFoundError('No user with such id');
+    }
+
     res.send(user);
   } catch (err) {
-    if (err.message === 'NotValidId') {
-      res.status(ERROR_CODE_BAD_REQUEST).send({ message: 'No such user' });
-    } else if (err.name === 'ValidationError') {
-      res.status(ERROR_CODE_USER).send({ message: err.message });
+    if (err.name === 'CastError') {
+      next(new BadRequestError('Invalid Data'));
     } else {
-      res.status(ERROR_CODE_SERVER).send({ message: message500 });
+      next(err);
     }
   }
 };
 
-const updateAvatarUser = async (req, res) => {
-  try {
-    const avatarLink = req.body.avatar;
-    const avatar = await User.findByIdAndUpdate(req.user._id, {
-      avatar: avatarLink,
-    }, { runValidators: true, new: true })
-      .orFail(new Error('NotValidId'));
-    res.send(avatar);
-  } catch (err) {
-    if (err.message === 'NotValidId') {
-      res.status(ERROR_CODE_BAD_REQUEST).send({ message: 'No such user' });
-    } else if (err.name === 'ValidationError') {
-      res.status(ERROR_CODE_USER).send({ message: err.message });
-    } else {
-      res.status(ERROR_CODE_SERVER).send({ message: message500 });
-    }
-  }
+const updateAvatarUser = (req, res, next) => {
+  const { avatar } = req.body;
+  const owner = req.user._id;
+
+  return User.findByIdAndUpdate(owner, { avatar }, { new: true })
+    .then((user) => {
+      if (!user) {
+        next(new NotFoundError('No user with such id'));
+      }
+      res.send(user);
+    })
+    .catch(next);
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -104,18 +112,14 @@ const login = (req, res) => {
       );
       return res.send({ jwt: token });
     })
-    .catch((err) => {
-      if (err.message === 'NotValidId') {
-        res.status(400).send({ message: 'No such user' });
-      } else if (err.name === 'ValidationError') {
-        res.status(422).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: 'Internal server error' });
-      }
-    });
+    .catch(() => {
+      throw new UnauthorizedError('Failed to authorized');
+    })
+    .catch(next);
 };
 
 module.exports = {
+  getMe,
   getUsers,
   getUserById,
   createUser,
