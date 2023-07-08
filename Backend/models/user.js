@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 30,
     default: 'Jacques Cousteau',
-
   },
   about: {
     type: String,
@@ -27,40 +26,42 @@ const userSchema = new mongoose.Schema({
         return validator.isURL(v);
       },
     },
-    email: {
-      type: String,
-      minlength: 4,
-      maxlength: 50,
-      validate: {
-        validator: (correct) => validator.isEmail(correct),
-        message: 'Wrong email',
-      },
-      required: true,
-      unique: true,
+  },
+  email: {
+    type: String,
+    minlength: 4,
+    maxlength: 50,
+    validate: {
+      validator: (correct) => validator.isEmail(correct),
+      message: 'Wrong email',
     },
-    password: {
-      type: String,
-      required: true,
-      select: false,
-    },
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false,
   },
 });
 
 userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email }).select('+password').then((user) => {
-    if (!user) {
-      return Promise.reject(new Error('Wrong data'));
-    }
-
-    return bcrypt.compare(password, user.password).then((matched) => {
-      if (!matched) {
+  return this.findOne({ email })
+    .select('+password')
+    .then((user) => {
+      if (!user) {
         return Promise.reject(new Error('Wrong data'));
       }
 
-      return user;
-    });
-  });
-};
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error('Wrong data'));
+          }
 
+          return user;
+        });
+    });
+};
 
 module.exports = mongoose.model('User', userSchema);

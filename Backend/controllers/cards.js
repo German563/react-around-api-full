@@ -1,13 +1,14 @@
 const Card = require('../models/card');
-
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 const AccessError = require('../errors/access-error');
 
+const { ValidationError, CastError } = require('mongoose').Error;
+
 const getCards = (req, res, next) => {
   Card.find({})
     .then((cardList) => res.send(cardList))
-    .catch((error) => next(error));
+    .catch(next);
 };
 
 const createCard = (req, res, next) => {
@@ -16,32 +17,33 @@ const createCard = (req, res, next) => {
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequestError('Invalid Data');
+      if (err instanceof ValidationError || err instanceof CastError) {
+        next(new BadRequestError('Invalid Data'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
+
 const deleteCard = (req, res, next) => {
   const owner = req.user._id;
-  Card
-    .findOne({ _id: req.params.cardId })
+  Card.findOne({ _id: req.params.cardId })
     .orFail(() => new NotFoundError('No card with such Id'))
     .then((card) => {
       if (!card.owner.equals(owner)) {
-        next(new AccessError('Cant delete tis card'));
+        next(new AccessError('Cannot delete this card'));
       } else {
-        Card.deleteOne(card)
-          .then(() => res.status(200).send({ message: 'Card was deleted' }));
+        return Card.deleteOne(card);
       }
     })
+    .then(() => res.status(200).send({ message: 'Card was deleted' }))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof CastError) {
         next(new BadRequestError('Invalid Data'));
+      } else {
+        next(err);
       }
-      throw err;
-    })
-    .catch(next);
+    });
 };
 
 const likeCard = (req, res, next) => {
@@ -49,17 +51,18 @@ const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: owner } }, { new: true })
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('No card with such Id');
+        next(new NotFoundError('No card with such Id'));
+      } else {
+        res.status(200).send(card);
       }
-      return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequestError('Invalid Data');
+      if (err instanceof CastError) {
+        next(new BadRequestError('Invalid Data'));
+      } else {
+        next(err);
       }
-      throw err;
-    })
-    .catch(next);
+    });
 };
 
 const disLikeCard = (req, res, next) => {
@@ -67,17 +70,18 @@ const disLikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: owner } }, { new: true })
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('No card with such Id');
+        next(new NotFoundError('No card with such Id'));
+      } else {
+        res.status(200).send(card);
       }
-      return res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequestError('Invalid Data');
+      if (err instanceof CastError) {
+        next(new BadRequestError('Invalid Data'));
+      } else {
+        next(err);
       }
-      throw err;
-    })
-    .catch(next);
+    });
 };
 
 module.exports = {

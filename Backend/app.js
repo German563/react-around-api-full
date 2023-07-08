@@ -20,6 +20,7 @@ const { port = 3000 } = process.env;
 app.use('*', cors());
 
 mongoose.connect('mongodb://127.0.0.1:27017/aroundb');
+const errorHandler = require('./middlewares/errorHandler');
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -67,13 +68,13 @@ app.post(
   }),
   createUser,
 );
-
+app.use(auth);
 app.use('/', usersRouter);
 app.use(cardsRouter);
 
-app.use(auth);
 app.use(errorLogger);
 app.use(errors());
+app.use(errorHandler);
 app.use('/', (req, res) => {
   res.status(NotFoundError).send({ message: 'Requested resource not found' });
 });
