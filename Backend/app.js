@@ -10,7 +10,7 @@ const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
-app.use(cors());
+app.use('*', cors());
 
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
@@ -23,19 +23,7 @@ mongoose.set('strictQuery', false);
 
 const errorHandler = require('./middlewares/errorHandler');
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-
-  if (req.method === 'OPTIONS') {
-    res.send(200);
-  }
-
-  next();
-});
-
-app.use(express.json()); // Parse request bodies as JSON
+app.use(express.json());
 
 app.use(cors());
 app.get('/crash-test', () => {
