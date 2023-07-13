@@ -54,12 +54,13 @@ const getUserById = async (req, res, next) => {
 const createUser = async (req, res, next) => {
   try {
     const {
-      name, about, email, password,
+      name, about, avatar, email, password,
     } = req.body;
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
       name,
       about,
+      avatar,
       email,
       password: hash,
     });

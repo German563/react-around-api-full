@@ -18,7 +18,7 @@ const cardsRouter = require('./routes/cards');
 
 const { port = 3000 } = process.env;
 
-const mongoDbUrl ='mongodb://127.0.0.1:27017/aroundb';
+const mongoDbUrl = 'mongodb://127.0.0.1:27017/aroundb';
 
 const mongooseConnectOptions = {
   useNewUrlParser: true,
@@ -76,7 +76,7 @@ app.use(cardsRouter);
 
 app.use((req, res, next) => {
   next(new NotFoundError('Not found'));
- });
+});
 
 app.use(errorLogger);
 app.use(errors());
