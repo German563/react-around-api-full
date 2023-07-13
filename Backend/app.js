@@ -63,7 +63,7 @@ app.post(
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
-      avatar: Joi.string().required().regex(/(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg))/),
+      avatar: Joi.string().regex(/(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg))/),
       email: Joi.string().email().required(),
       password: Joi.string().required(),
     }),
@@ -77,9 +77,6 @@ app.use(cardsRouter);
 app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
-app.use('/', (req, res) => {
-  res.status(NotFoundError).send({ message: 'Requested resource not found' });
-});
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

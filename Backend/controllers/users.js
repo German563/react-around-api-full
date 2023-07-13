@@ -40,7 +40,7 @@ const getMe = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.params.userId);
     if (!user) {
       next(new NotFoundError('No user with such id'));
     } else {
