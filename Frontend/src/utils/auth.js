@@ -1,5 +1,5 @@
 class Api {
-  constructor({ address}) {
+  constructor({ address }) {
     this._address = address;
   }
 
@@ -23,13 +23,17 @@ class Api {
     return fetch(url, options).then(this._checkResponse);
   }
 
-  register(password, email) {
+  register(data) {
     return this._request(`${this._address}/signup`, {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ password, email })
+      body: JSON.stringify({
+        email: data.email,
+        password: data.password,
+      }),
     });
   }
 
@@ -37,7 +41,7 @@ class Api {
     return this._request(`${this._address}/signin`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${this._token}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -51,7 +55,7 @@ class Api {
     return this._request(`${this._address}/users/me`, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
     });
@@ -59,8 +63,8 @@ class Api {
 }
 
 export const authApi = new Api({
-  address: 'https://herman.goldberg.api.crabdance.com',
+  address: "https://herman.goldberg.api.crabdance.com",
   headers: {
-    'Content-Type': 'application/json'
+    "Content-Type": "application/json",
   },
 });
