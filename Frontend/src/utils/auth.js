@@ -60,9 +60,6 @@ class Api {
   }
 }
 export const authApi = new Api({
-  address: "https://register.nomoreparties.co",
-  token: "e311eb36-6a4d-4f2d-8784-2a64b37b741e",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  address: 'https://api.herman.goldberg.crabdance.com',
+  // token: "e311eb36-6a4d-4f2d-8784-2a64b37b741e",
 });
