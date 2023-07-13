@@ -1,7 +1,6 @@
 class Api {
-  constructor({ address, token }) {
+  constructor({ address}) {
     this._address = address;
-    this._token = token;
   }
 
   _header(customHeaders) {
@@ -24,17 +23,13 @@ class Api {
     return fetch(url, options).then(this._checkResponse);
   }
 
-  register(data) {
+  register(password, email) {
     return this._request(`${this._address}/signup`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${this._token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        email: data.email,
-        password: data.password,
-      }),
+      body: JSON.stringify({ password, email })
     });
   }
 
