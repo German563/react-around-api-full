@@ -60,16 +60,15 @@ app.post(
   login,
 );
 
-app.post(
-  '/signup',
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().email().required(),
-      password: Joi.string().required(),
-    }),
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().regex(/(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg))/),
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
   }),
-  createUser,
-);
+}), createUser);
 app.use(auth);
 app.use('/', usersRouter);
 app.use(cardsRouter);
