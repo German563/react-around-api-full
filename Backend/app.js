@@ -8,16 +8,15 @@ const { createUser, login } = require('./controllers/users');
 
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const NotFoundError = require('./errors/not-found-error');
 
 const app = express();
+app.use(cors());
 
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 
 const { port = 3000 } = process.env;
 
-app.use('*', cors());
 
 mongoose.connect('mongodb://127.0.0.1:27017/aroundb');
 mongoose.set('strictQuery', false);
