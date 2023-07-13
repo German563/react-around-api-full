@@ -17,9 +17,17 @@ const cardsRouter = require('./routes/cards');
 
 const { port = 3000 } = process.env;
 
-
 mongoose.connect('mongodb://127.0.0.1:27017/aroundb');
-mongoose.set('strictQuery', false);
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+  if (req.method === 'OPTIONS') {
+    res.send(200);
+  }
+  next();
+});
 
 const errorHandler = require('./middlewares/errorHandler');
 
