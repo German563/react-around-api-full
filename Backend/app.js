@@ -8,6 +8,8 @@ const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
+const NotFoundError = require('./errors/not-found-error');
+
 const app = express();
 app.use('*', cors());
 
@@ -71,6 +73,10 @@ app.post(
 app.use(auth);
 app.use('/', usersRouter);
 app.use(cardsRouter);
+
+app.use((req, res, next) => {
+  next(new NotFoundError('Not found'));
+ });
 
 app.use(errorLogger);
 app.use(errors());
