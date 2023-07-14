@@ -3,14 +3,6 @@ class Api {
     this._address = address;
   }
 
-  _header(customHeaders) {
-    if (customHeaders) {
-      return customHeaders;
-    } else {
-      return this._headers;
-    }
-  }
-
   _checkResponse(res) {
     if (res.ok) {
       return res.json();
@@ -27,7 +19,6 @@ class Api {
     return this._request(`${this._address}/signup`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -64,7 +55,4 @@ class Api {
 
 export const authApi = new Api({
   address: "https://herman.goldberg.api.crabdance.com",
-  headers: {
-    "Content-Type": "application/json",
-  },
 });

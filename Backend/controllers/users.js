@@ -64,7 +64,12 @@ const createUser = async (req, res, next) => {
       email,
       password: hash,
     });
-    res.status(200).send({ mail: user.email });
+    res.status(200).send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+    });
   } catch (err) {
     if (err instanceof ValidationError || err instanceof CastError) {
       next(new BadRequestError('Invalid Data'));
