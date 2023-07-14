@@ -96,5 +96,5 @@ class Api {
 }
 
 export const api = new Api({
-  address: 'https://herman.goldberg.api.crabdance.com',
+  address: 'https://herman.goldberg.api.crabdance.com/',
 });

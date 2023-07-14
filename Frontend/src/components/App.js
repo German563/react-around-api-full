@@ -162,7 +162,7 @@ function App() {
       });
   }
   function checkLoggedIn() {
-    return !!localStorage.getItem("token");
+    return localStorage.getItem("token");
   }
   function onSignIn(data) {
     authApi

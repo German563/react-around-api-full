@@ -46,7 +46,7 @@ class Api {
     return this._request(`${this._address}/users/me`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
     });
@@ -54,5 +54,8 @@ class Api {
 }
 
 export const authApi = new Api({
-  address: "https://herman.goldberg.api.crabdance.com",
+  address: "https://herman.goldberg.api.crabdance.com/",
+  headers: {
+    'Content-Type': 'application/json'
+  },
 });
