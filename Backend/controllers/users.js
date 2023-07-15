@@ -6,7 +6,6 @@ const User = require('../models/user');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
@@ -89,7 +88,7 @@ const updateUser = async (req, res, next) => {
         name: req.body.name,
         about: req.body.about,
       },
-      { runValidators: true, new: true }
+      { runValidators: true, new: true },
     );
     if (!user) {
       next(new NotFoundError('No user with such id'));
@@ -127,7 +126,7 @@ const login = async (req, res, next) => {
     const token = jwt.sign(
       { _id: user._id },
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-      { expiresIn: '7d' }
+      { expiresIn: '7d' },
     );
     res.send({ jwt: token });
   } catch (err) {

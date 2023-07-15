@@ -1,9 +1,8 @@
+const { ValidationError, CastError } = require('mongoose').Error;
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 const AccessError = require('../errors/access-error');
-
-const { ValidationError, CastError } = require('mongoose').Error;
 
 const getCards = (req, res, next) => {
   Card.find({})
@@ -27,7 +26,7 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const owner = req.user._id;
-  Card.findOne({ _id: req.params.cardId })
+  return Card.findOne({ _id: req.params.cardId })
     .orFail(() => new NotFoundError('No card with such Id'))
     .then((card) => {
       if (!card.owner.equals(owner)) {
@@ -35,6 +34,7 @@ const deleteCard = (req, res, next) => {
       } else {
         return Card.deleteOne(card);
       }
+      return true;
     })
     .then(() => res.status(200).send({ message: 'Card was deleted' }))
     .catch((err) => {
