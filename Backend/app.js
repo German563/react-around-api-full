@@ -18,15 +18,8 @@ const cardsRouter = require('./routes/cards');
 
 const { port = 3000 } = process.env;
 
-const mongoDbUrl = 'mongodb://127.0.0.1:27017/aroundb';
+mongoose.connect('mongodb://127.0.0.1:27017/aroundb');
 
-const mongooseConnectOptions = {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-};
-
-mongoose.connect(mongoDbUrl, mongooseConnectOptions);
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', '*');
