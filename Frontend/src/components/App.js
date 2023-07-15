@@ -37,7 +37,6 @@ function App() {
       return false;
     }
   });
-  
   const [email, setEmail] = React.useState("");
   const [currentUser, setCurrentUser] = React.useState(
     {

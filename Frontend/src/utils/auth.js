@@ -16,23 +16,24 @@ class Api {
   }
 
   register(data) {
-    return this._request(`${this._address}/signup`, {
-      method: "POST",
+    return fetch(`${this._address}/signup`, {
+      method: 'POST',
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: data.email,
         password: data.password,
-      }),
-    });
+        email: data.email,
+      })
+    })
+      .then(this._checkResponse)
   }
+
 
   authorize(data) {
     return this._request(`${this._address}/signin`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -54,7 +55,7 @@ class Api {
 }
 
 export const authApi = new Api({
-  address: "https://herman.goldberg.api.crabdance.com/",
+  address: "https://herman.goldberg.api.crabdance.com",
   headers: {
     'Content-Type': 'application/json'
   },
