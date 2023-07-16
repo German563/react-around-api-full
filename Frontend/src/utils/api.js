@@ -23,11 +23,9 @@ class Api {
       method: method,
       headers: headers,
     };
-
     if (body) {
       requestOptions.body = JSON.stringify(body);
     }
-
     return fetch(`${this._baseUrl}${urlEnd}`, requestOptions).then((res) => {
       if (res.ok) {
         return res.json();
@@ -71,8 +69,8 @@ class Api {
     });
   }
 
-  addCardLike(id) {
-    return this._apiRequest(`/cards/${id}/likes`, "PUT", {
+  addCardLike(cardId) {
+    return this._apiRequest(`/cards/${cardId}/likes`, "PUT", {
       "Content-Type": "application/json",
     });
   }
@@ -92,14 +90,14 @@ class Api {
     );
   }
 
-  removeLike(id) {
-    return this._apiRequest(`/cards/${id}/likes`, "DELETE", {
+  removeLike(cardId) {
+    return this._apiRequest(`/cards/${cardId}/likes`, "DELETE", {
       "Content-Type": "application/json",
     });
   }
 
-  removeCard(id) {
-    return this._apiRequest(`/cards/${id}`, "DELETE", {
+  removeCard(cardId) {
+    return this._apiRequest(`/cards/${cardId}`, "DELETE", {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     });
@@ -136,11 +134,11 @@ class Api {
 }
 
 export const api = new Api({
-  baseUrl: "https://herman.goldberg.api.crabdance.com/",
+  baseUrl: "https://herman.goldberg.api.crabdance.com",
 });
 
 export const authApi = new Api({
-  baseUrl: "https://herman.goldberg.api.crabdance.com/",
+  baseUrl: "https://herman.goldberg.api.crabdance.com",
   headers: {
     "Content-Type": "application/json",
   },
