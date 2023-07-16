@@ -6,8 +6,7 @@ import Menu from "./Menu";
 import Footer from "./Footer";
 import Register from "./Register";
 import ImagePopup from "./ImagePopup.js";
-import { api } from "../utils/api";
-import { authApi } from "../utils/auth";
+import { api, authApi } from "../utils/api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import EditProfilePopup from "./EditProfilePopup.js";
 import EditAvatarPopup from "./EditAvatarPopup.js";
@@ -17,7 +16,6 @@ import InfoTooltip from "./InfoTooltip";
 import Login from "./Login.js";
 
 function App() {
-  
   const [loggedIn, setLoggedIn] = React.useState(checkLoggedIn());
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] =
@@ -37,21 +35,19 @@ function App() {
       return false;
     }
   });
+
   const [email, setEmail] = React.useState("");
-  const [currentUser, setCurrentUser] = React.useState(
-    {
-      avatar:
-        "",
-      name: "",
-      about: "",
-    },
-    []
-  );
+  const [jwt, setJwt] = React.useState("");
+  const [currentUser, setCurrentUser] = React.useState({
+    avatar: "",
+    name: "",
+    about: "",
+  });
   React.useEffect(() => {
     api
       .getProfileData()
-      .then((user) => {
-        setCurrentUser(user);
+      .then((data) => {
+        setCurrentUser(data.data);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -74,41 +70,37 @@ function App() {
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true);
     setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event("resize"));
     }, 100);
-  
   }
 
   function handleEditProfileClick() {
     setEditProfilePopupOpen(true);
     setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event("resize"));
     }, 100);
-  
   }
 
   function handleAddPlaceClick() {
     setAddPlacePopupOpen(true);
     setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event("resize"));
     }, 100);
-  
   }
 
   function handleCardClick(card) {
     setSelectedCard(card);
     setBackPopupOpen(true);
     setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event("resize"));
     }, 100);
-  
   }
 
-  function handleUpdateUser(user) {
+  function handleUpdateUser(data) {
     api
-      .editUserProfile(user)
-      .then((updatedUser) => {
-        setCurrentUser(updatedUser);
+      .editUserProfile(data)
+      .then((data) => {
+        setCurrentUser(data);
         closeAllPopups();
       })
       .catch((error) => {
@@ -168,9 +160,10 @@ function App() {
       .authorize(data)
       .then((res) => {
         setLoggedIn(true);
-        localStorage.setItem("token", res.token);
+        localStorage.setItem("token", res.jwt);
         setEmail(data.email);
         handleTooltipOpen(true);
+        setJwt(res.jwt);
       })
       .catch((err) => {
         handleTooltipOpen(false, `Can't login: ${err}`);
@@ -200,7 +193,7 @@ function App() {
         })
         .catch((err) => {
           if (err === 401) {
-            setLoggedIn(false)
+            setLoggedIn(false);
             console.log("Wrong token");
           }
         });
@@ -208,7 +201,7 @@ function App() {
   }
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some((user) => user._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i === currentUser._id);
     function updateCards(newCard) {
       const newCards = cards.map((c) => (c._id === card._id ? newCard : c));
       setCards(newCards);
@@ -222,7 +215,7 @@ function App() {
         .catch((err) => console.log(err));
     } else {
       api
-        .changeLikeCardStatus(card._id)
+        .addCardLike(card._id)
         .then((newCard) => {
           updateCards(newCard);
         })
@@ -231,7 +224,7 @@ function App() {
   }
 
   function handleCardDelete(card) {
-    const isOwn = card.owner._id === currentUser._id;
+    const isOwn = card.owner === currentUser._id;
     if (isOwn) {
       api
         .removeCard(card._id)
@@ -244,13 +237,14 @@ function App() {
         });
     }
   }
-
-  function handleUpdateAvatar(avatar) {
+  function handleUpdateAvatar(data) {
     api
-      .editAvatar(avatar)
-      .then((avatar) => {
-        setCurrentUser(avatar);
-        closeAllPopups();
+      .editAvatar(data.avatar)
+      .then(() => {
+        setCurrentUser({
+          ...currentUser,
+          avatar: data.avatar,
+        });
       })
       .catch((err) => console.log(err));
   }
@@ -259,7 +253,7 @@ function App() {
     api
       .addNewCard(data)
       .then((newCard) => {
-        setCards([newCard, ...cards]);
+        setCards([newCard.data, ...cards]);
         closeAllPopups();
       })
       .catch((err) => console.log(err));
@@ -268,7 +262,7 @@ function App() {
     localStorage.removeItem("token");
     window.location.reload();
     setLoggedIn(false);
-    setEmail("")
+    setEmail("");
   }
   React.useEffect(() => {
     api
@@ -314,7 +308,6 @@ function App() {
               setEmail={setEmail}
             />
             <Header
-
               onSignIn={onSignIn}
               checkToken={checkToken}
               email={email}

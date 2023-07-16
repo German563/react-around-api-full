@@ -17,17 +17,17 @@ router.post('/cards', celebrate({
     link: Joi.string().required().regex(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]+\.[a-zA-Z0-9()]+([-a-zA-Z0-9()@:%_\\+.~#?&/=#]*)/),
   }),
 }), createCard);
-router.delete('/cards/:cardId', celebrate({
+router.delete('/cards/:id', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).required().hex(),
   }),
 }), deleteCard);
-router.put('/cards/:cardId/likes', celebrate({
+router.put('/cards/:id/likes', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).required().hex(),
   }),
 }), likeCard);
-router.delete('/cards/:cardId/likes', celebrate({
+router.delete('/cards/:id/likes', celebrate({
   params: Joi.object().keys({
     cardId: Joi.string().length(24).required().hex(),
   }),
